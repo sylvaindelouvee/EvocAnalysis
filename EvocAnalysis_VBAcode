@@ -1,9 +1,10 @@
-Sub EvocAnalysis()
+' Authors: Sylvain Delouvée & OpenAI, September 2023
+' Citation: Delouvée S. & OpenAI (2023). EvocAnalysis. A VBA code for verbal association analysis. Cutxan, CERISE.
+' Github: https://github.com/sylvaindelouvee/EvocAnalysis
+' CERISE, CollaborativE infoRmatIon on Social rEpresentations
+' Version: 1.1
 
-    ' Authors: Sylvain Delouvée & OpenAI, September 2023
-    ' Citation: Delouvée S. & OpenAI (2023). EvocAnalysis. A VBA code for verbal association analysis. Cutxan, CERISE.
-    ' Github: https://github.com/sylvaindelouvee/EvocAnalysis
-    ' CERISE, CollaborativE infoRmatIon on Social rEpresentations
+Sub EvocAnalysis()
 
     Dim ws As Worksheet
     Dim AnalysisWs As Worksheet
@@ -18,29 +19,28 @@ Sub EvocAnalysis()
     Dim RankSum As Double
     Dim Occurrences As Integer
     Dim MaxRow As Long
+    Dim response As VbMsgBoxResult
+
+    ' Step 0: Display the initial message and check for user confirmation
+    response = MsgBox("EvocAnalysis is a CERISE (CollaborativE infoRmatIon on Social rEpresentations) tool. Please note that there should be no headers or other numerical data in the active sheet. The first column should contain all first evocations (by appearance or ranking) for each participant. The second column should contain the second evocations, and so on.", vbYesNo + vbInformation, "EvocAnalysis")
+    If response = vbNo Then Exit Sub
 
     ' Reference the active sheet
     Set ws = ThisWorkbook.ActiveSheet
 
-    ' Step 0: Clean the corpus by removing leading and trailing spaces from each cell
+    ' Step 1: Clean the corpus by removing leading and trailing spaces from each cell
     For Each rCell In ws.UsedRange
         rCell.Value = Trim(rCell.Value)
     Next rCell
-    
-    ' Step 1: Ask for the number of columns to analyze
-    ColCount = InputBox("EvocAnalysis is a CERISE (CollaborativE infoRmatIon on Social rEpresentations) tool. How many evocations have you collected (i.e. how many columns are there to analyze)? Please note that there must be no headers or other data in the active sheet.", "Number of columns")
 
-    ' Validate the input
-    If ColCount < 2 Or ColCount > 10 Then
-        MsgBox "Please enter a number between 2 and 10."
-        Exit Sub
-    End If
+    ' Step 2: Determine the number of columns to analyze based on non-empty columns
+    ColCount = ws.Cells(1, ws.Columns.Count).End(xlToLeft).Column
 
     ' Reference the active sheet and rename it to 'Data'
     Set ws = ThisWorkbook.ActiveSheet
     ws.Name = "Data"
 
-    ' Step 2: Create a new sheet 'Analysis' after the 'Data' sheet
+    ' Step 3: Create a new sheet 'Analysis' after the 'Data' sheet
     Set AnalysisWs = ThisWorkbook.Worksheets.Add(After:=ws)
     AnalysisWs.Name = "Analysis"
 
@@ -75,25 +75,25 @@ Sub EvocAnalysis()
         RowCounter = RowCounter + 1
     Next Value
 
-    ' Step 3: Calculate the frequency of each evocation
-LastRow = AnalysisWs.Cells(AnalysisWs.Rows.Count, 1).End(xlUp).Row
-For i = 2 To LastRow
-    FrequencyCount = 0
-    For j = 1 To ColCount
-        Set rRange = ws.Range(ws.Cells(1, j), ws.Cells(ws.Cells(ws.Rows.Count, j).End(xlUp).Row, j))
-        For Each rCell In rRange
-            If LCase(rCell.Value) = LCase(AnalysisWs.Cells(i, 1).Value) Then
-                FrequencyCount = FrequencyCount + 1
-            End If
-        Next rCell
-    Next j
-    AnalysisWs.Cells(i, 2).Value = FrequencyCount
-Next i
+    ' Step 4: Calculate the frequency of each evocation
+    LastRow = AnalysisWs.Cells(AnalysisWs.Rows.Count, 1).End(xlUp).Row
+    For i = 2 To LastRow
+        FrequencyCount = 0
+        For j = 1 To ColCount
+            Set rRange = ws.Range(ws.Cells(1, j), ws.Cells(ws.Cells(ws.Rows.Count, j).End(xlUp).Row, j))
+            For Each rCell In rRange
+                If LCase(rCell.Value) = LCase(AnalysisWs.Cells(i, 1).Value) Then
+                    FrequencyCount = FrequencyCount + 1
+                End If
+            Next rCell
+        Next j
+        AnalysisWs.Cells(i, 2).Value = FrequencyCount
+    Next i
 
-    ' Step 4: Sort data by frequency and then alphabetically
+    ' Step 5: Sort data by frequency and then alphabetically
     AnalysisWs.Range("A1:B" & LastRow).Sort Key1:=AnalysisWs.Range("B2"), Order1:=xlDescending, Key2:=AnalysisWs.Range("A2"), Order2:=xlAscending, Header:=xlYes
 
-    ' Step 5: Calculate the Average Rank
+    ' Step 6: Calculate the Average Rank
     AnalysisWs.Cells(1, 3).Value = "Average Rank"
     AnalysisWs.Cells(1, 3).Font.Bold = True
 
@@ -112,22 +112,22 @@ Next i
         AnalysisWs.Cells(i, 3).Value = RankSum / Occurrences
     Next i
 
-    ' Step 6: Total number of evocations
+    ' Step 7: Total number of evocations
     AnalysisWs.Cells(1, 5).Value = "Total number of evocations"
     AnalysisWs.Cells(1, 5).Font.Bold = True
     AnalysisWs.Cells(2, 5).Formula = "=SUM(B2:B" & LastRow & ")"
 
-    ' Step 7: Number of different evocations
+    ' Step 8: Number of different evocations
     AnalysisWs.Cells(4, 5).Value = "Number of different evocations"
     AnalysisWs.Cells(4, 5).Font.Bold = True
     AnalysisWs.Cells(5, 5).Value = LastRow - 1
 
-    ' Step 8: Number of hapax
+    ' Step 9: Number of hapax
     AnalysisWs.Cells(7, 5).Value = "Number of hapax"
     AnalysisWs.Cells(7, 5).Font.Bold = True
     AnalysisWs.Cells(8, 5).Formula = "=COUNTIF(B2:B" & LastRow & ",1)"
 
-    ' Step 9: Number of participants
+    ' Step 10: Number of participants
     AnalysisWs.Cells(10, 5).Value = "Number of participants"
     AnalysisWs.Cells(10, 5).Font.Bold = True
     MaxRow = 0
@@ -138,7 +138,7 @@ Next i
     Next j
     AnalysisWs.Cells(11, 5).Value = MaxRow
 
-    ' Step 10: Rarity index
+    ' Step 11: Rarity index
     AnalysisWs.Cells(13, 5).Value = "Rarity index"
     AnalysisWs.Cells(13, 5).Font.Bold = True
     AnalysisWs.Cells(14, 5).Formula = "=E8/E2"
@@ -152,7 +152,7 @@ Next i
     AnalysisWs.Cells(14, 6).Formula = "=E14"
     AnalysisWs.Cells(14, 6).NumberFormat = "0.00%"
 
-    ' Step 11: Diversity index
+    ' Step 12: Diversity index
     AnalysisWs.Cells(16, 5).Value = "Diversity index"
     AnalysisWs.Cells(16, 5).Font.Bold = True
     AnalysisWs.Cells(17, 5).Formula = "=E5/E2"
@@ -166,7 +166,7 @@ Next i
     AnalysisWs.Cells(17, 6).Formula = "=E17"
     AnalysisWs.Cells(17, 6).NumberFormat = "0.00%"
 
-    ' Step 12: Center all the new columns
+    ' Step 13: Center all the new columns
     AnalysisWs.Range("A1:C" & LastRow).HorizontalAlignment = xlCenter
     AnalysisWs.Range("E1:E17").HorizontalAlignment = xlCenter
 
