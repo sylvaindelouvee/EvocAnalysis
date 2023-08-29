@@ -1,7 +1,7 @@
 # EvocAnalysis
 A VBA code for verbal association analysis
 
-EvocAnalysis is an Excel macro (Microsoft Cor- poration, 2023) for rapid analysis of verbal associa- tions (Moliner & Lo Monaco, 2017).
+EvocAnalysis is an Excel macro (Microsoft Cor- poration, 2023) for rapid analysis of verbal associations (Moliner & Lo Monaco, 2017).
 
 From a collection of evocations, you’ll obtain:
 
@@ -17,14 +17,12 @@ chosen);
 • the diversity index.
 
 
-# Download a ready-to-use XLSM file.
-or
-# Install the VBA code yourself.
+Download a ready-to-use XLSM file // or // Install the VBA code yourself.
 
 Read the tutorial.pdf file for detailed instructions.
 
 
-' Citation: Delouvée S. & OpenAI (2023). EvocAnalysis. A VBA code for verbal association analysis. Cutxan, CERISE.
-' Github: https://github.com/sylvaindelouvee/EvocAnalysis
-' CERISE, CollaborativE infoRmatIon on Social rEpresentations
-' Version: 1.1
+________________________________
+Citation: Delouvée S. & OpenAI (2023). EvocAnalysis. A VBA code for verbal association analysis. Cutxan: CERISE.
+CERISE, CollaborativE infoRmatIon on Social rEpresentations
+Version: 1.1
